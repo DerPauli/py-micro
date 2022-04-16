@@ -1,5 +1,6 @@
 import os
 import pymongo
+import json
 from bson import json_util
 from bson.objectid import ObjectId
 
@@ -32,4 +33,29 @@ class MongoDB():
         return json_util.dumps(bson)
 
     def insert_tweets(self, tweets):
-        self.collection.insert_many(tweets)
+        for tweet in tweets:
+            td = {
+                "id": tweet['id'],
+                "text": tweet['text'],
+                "name": tweet['name'],
+                "username": tweet['username'],
+                "verified": tweet['verified'],
+                "author_id": tweet['author_id'],
+                "created_at": tweet['created_at'],
+                "public_metrics": tweet['public_metrics'],
+                "source": tweet['source']
+            }
+
+            self.collection.update_one(filter={'id': tweet['id']}, update={"$set": td}, upsert=True)
+
+    def get_all_tweets(self, max_entries=0):
+        r = []
+        c = self.collection.find().limit(max_entries)
+        
+        for i in c:
+            r.append(i)
+
+        return r
+
+    def print_bson(self, bson):
+        print(json.dumps(json.loads(self.convert_to_json(bson)), indent=4, sort_keys=True))

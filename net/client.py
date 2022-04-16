@@ -1,4 +1,7 @@
+from curses import has_key
 import os
+import json
+from textwrap import indent
 import requests
 
 class Client:
@@ -31,8 +34,18 @@ class Client:
         h = { 'Authorization': f'Bearer {token}' }
 
         if from_user != '':
-            query_url = f'tweets/search/recent?query=from:{from_user}&tweet.fields=created_at,public_metrics,source&expansions=author_id&user.fields=created_at'
+            query_url = f'tweets/search/recent?query=from:{from_user}&tweet.fields=created_at,public_metrics,source&expansions=author_id&user.fields=created_at,name,username,verified'
             r = requests.get(self.url + query_url, headers=self.__add_headers(True, h))
             
-            if r != None:
-                return r.json()['data']
+            if r.status_code == r.ok:
+                result_count = r.json().get('meta').get('result_count')
+                if result_count > 0:
+                    json = r.json().get('data')
+                    for key in json:
+                        key['name'] = r.json()['includes']['users'][0]['name']
+                        key['username'] = r.json()['includes']['users'][0]['username']
+                        key['verified'] = r.json()['includes']['users'][0]['verified']
+
+                    return json
+            
+            return None
