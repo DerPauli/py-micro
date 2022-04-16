@@ -23,7 +23,7 @@ class Client:
 
         return h
 
-    def load_latest_tweets(self, from_user):
+    def load_latest_tweets(self, from_user, to_fetch=10):
         # prepare bearer
         token = os.getenv(self.tt_key)
 
@@ -34,10 +34,10 @@ class Client:
         h = { 'Authorization': f'Bearer {token}' }
 
         if from_user != '':
-            query_url = f'tweets/search/recent?query=from:{from_user}&tweet.fields=created_at,public_metrics,source&expansions=author_id&user.fields=created_at,name,username,verified'
+            query_url = f'tweets/search/recent?query=from:{from_user}&max_results={to_fetch}&tweet.fields=created_at,public_metrics,source&expansions=author_id&user.fields=created_at,name,username,verified'
             r = requests.get(self.url + query_url, headers=self.__add_headers(True, h))
-            
-            if r.status_code == r.ok:
+
+            if r.ok:
                 result_count = r.json().get('meta').get('result_count')
                 if result_count > 0:
                     json = r.json().get('data')
@@ -47,5 +47,4 @@ class Client:
                         key['verified'] = r.json()['includes']['users'][0]['verified']
 
                     return json
-            
             return None

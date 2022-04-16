@@ -45,6 +45,11 @@
             <input name="handle" type="text" placeholder="@user" required>
             <button type="submit" class="btn btn-sm btn-primary">Load</button>
           </form>
+          <div class="mt-2">
+            <form action="/auto" method="GET">
+              <button type="submit" class="btn btn-sm btn-primary">Auto</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -55,6 +60,8 @@
             <th class="th-sm">Tweet
             </th>
             <th class="th-sm">From
+            </th>
+            <th class="th-sm">Username
             </th>
             <th class="th-sm">Created At
             </th>
@@ -73,7 +80,8 @@
                   <i class="fa-solid fa-square-check"></i>
                 {% endif %}
               </td>
-              <td>{{ t.created_at }}</td>
+              <td>@{{ t.username | lower }}</td>
+              <td>{{ t.created_at | fmtdatetime }}</td>
               <td>{{ t.public_metrics.like_count }}</td>
               <td>{{ t.public_metrics.retweet_count }}</td>
             </tr>
@@ -86,7 +94,7 @@
       <script>
         $(document).ready(function () {
           $('#ttable').DataTable({
-            "order": [[ 2, "desc" ]]
+            "order": [[ 3, "desc" ]]
           });
         });
       </script>
