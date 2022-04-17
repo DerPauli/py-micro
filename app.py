@@ -43,6 +43,9 @@ def root():
 def fetch():
     tuser = request.form.get('handle')
     if tuser != None and tuser != '':
+        if tuser[0] == '@':
+            tuser = tuser[1:]
+
         t = c.load_latest_tweets(tuser, ENTRIES_TO_FETCH)
         if t != None:
             bson = m.attach_oids(t)
